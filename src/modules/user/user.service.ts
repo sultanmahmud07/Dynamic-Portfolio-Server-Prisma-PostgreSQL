@@ -15,12 +15,9 @@ const getAllFromDB = async () => {
             id: true,
             name: true,
             email: true,
-            phone: true,
-            picture: true,
             createdAt: true,
             updatedAt: true,
             role: true,
-            status: true,
             posts: true
         },
         orderBy: {
@@ -40,11 +37,8 @@ const getUserById = async (id: number) => {
             name: true,
             email: true,
             role: true,
-            phone: true,
-            picture: true,
             createdAt: true,
             updatedAt: true,
-            status: true,
             posts: true
         }
     })
