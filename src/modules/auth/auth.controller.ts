@@ -26,6 +26,7 @@ const logout = (req: Request, res: Response) => {
 const loginWithEmailAndPassword = async (req: Request, res: Response) => {
     try {
         const result = await AuthService.loginWithEmailAndPassword(req.body)
+       console.log(result)
         res.status(200).json(result);
     } catch (error) {
         res.status(500).send(error)

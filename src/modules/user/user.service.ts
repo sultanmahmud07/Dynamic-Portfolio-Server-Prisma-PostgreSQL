@@ -1,12 +1,30 @@
 import { prisma } from "../../config/db";
 import { Prisma, User } from "@prisma/client"
+import bcrypt from "bcrypt";
+import { envVars } from "../../config/env";
 
-const createUser = async (payload: Prisma.UserCreateInput): Promise<User> => {
-    const createdUser = await prisma.user.create({
-        data: payload
-    })
-    return createdUser
-}
+const createUser = async ( payload: Prisma.UserCreateInput ): Promise<User> => {
+    const existingOwner = await prisma.user.findUnique({
+      where: { email: payload.email },
+    });
+
+    if (existingOwner) {
+        throw new Error("User already exists!");
+    }
+    const hashedPassword = await bcrypt.hash(
+    payload.password,
+    Number(envVars.BCRYPT_SALT_ROUND)
+  );
+
+  const user = await prisma.user.create({
+    data: {
+      ...payload,
+      password: hashedPassword,
+    },
+  });
+
+  return user;
+};
 
 
 const getAllFromDB = async () => {
@@ -15,6 +33,7 @@ const getAllFromDB = async () => {
             id: true,
             name: true,
             email: true,
+            password: true,
             createdAt: true,
             updatedAt: true,
             role: true,
