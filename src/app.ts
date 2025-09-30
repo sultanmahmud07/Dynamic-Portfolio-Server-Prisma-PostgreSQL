@@ -7,6 +7,7 @@ import { postRouter } from "./modules/post/post.router";
 import { authRouter } from "./modules/auth/auth.routes";
 import notFound from "./middlewares/notFound";
 import { envVars } from "./config/env";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 
 const app = express();
 
@@ -36,7 +37,8 @@ app.get("/", (_req, res) => {
   res.send("Portfolio API is running");
 });
 
-// app.use(globalErrorHandler)
+app.use(globalErrorHandler)
+
 app.use(notFound)
 
 

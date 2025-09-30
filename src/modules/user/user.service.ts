@@ -43,7 +43,7 @@ const getAllFromDB = async () => {
             createdAt: "desc"
         }
     });
-    return result;
+    return {data:result};
 }
 
 const getUserById = async (id: number) => {

@@ -1,61 +1,77 @@
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { NextFunction, Request, Response } from "express";
-// import { envVars } from "../config/env";
-// import AppError from "../errorHelpers/AppError";
-// import { handleCastError } from "../helpers/handleCastError";
-// import { handlerDuplicateError } from "../helpers/handleDuplicateError";
-// import { handlerValidationError } from "../helpers/handlerValidationError";
-// import { handlerZodError } from "../helpers/handlerZodError";
-// import { TErrorSources } from "../interfaces/error.types";
+import { NextFunction, Request, Response } from "express";
+import { envVars } from "../config/env";
+import AppError from "../errorHelpers/AppError";
+import { Prisma } from "@prisma/client";
+import { ZodError } from "zod";
+import { TErrorSources } from "../interfaces/error.types";
 
-// export const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-//     if (envVars.NODE_ENV === "development") {
-//         console.log(err);
-//     }
+// 🎯 Global Error Handler
+export const globalErrorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (envVars.NODE_ENV === "development") {
+    console.error("🔥 Global Error Handler:", err);
+  }
 
-//     let errorSources: TErrorSources[] = []
-//     let statusCode = 500
-//     let message = "Something Went Wrong!!"
+  let errorSources: TErrorSources[] = [];
+  let statusCode = 500;
+  let message = "Something Went Wrong!!";
 
-//     //Duplicate error
-//     if (err.code === 11000) {
-//         const simplifiedError = handlerDuplicateError(err)
-//         statusCode = simplifiedError.statusCode;
-//         message = simplifiedError.message
-//     }
-//     // Object ID error / Cast Error
-//     else if (err.name === "CastError") {
-//         const simplifiedError = handleCastError(err)
-//         statusCode = simplifiedError.statusCode;
-//         message = simplifiedError.message
-//     }
-//     else if (err.name === "ZodError") {
-//         const simplifiedError = handlerZodError(err)
-//         statusCode = simplifiedError.statusCode
-//         message = simplifiedError.message
-//         errorSources = simplifiedError.errorSources as TErrorSources[]
-//     }
-//     //Mongoose Validation Error
-//     else if (err.name === "ValidationError") {
-//         const simplifiedError = handlerValidationError(err)
-//         statusCode = simplifiedError.statusCode;
-//         errorSources = simplifiedError.errorSources as TErrorSources[]
-//         message = simplifiedError.message
-//     }
-//     else if (err instanceof AppError) {
-//         statusCode = err.statusCode
-//         message = err.message
-//     } else if (err instanceof Error) {
-//         statusCode = 500;
-//         message = err.message
-//     }
+  // ✅ Prisma Duplicate Constraint Error
+  if (
+    err instanceof Prisma.PrismaClientKnownRequestError &&
+    err.code === "P2002"
+  ) {
+    statusCode = 400;
+    message = `Duplicate value for field(s): ${(err.meta?.target as string[])?.join(", ")}`;
+  }
 
-//     res.status(statusCode).json({
-//         success: false,
-//         message,
-//         errorSources,
-//         err: envVars.NODE_ENV === "development" ? err : null,
-//         stack: envVars.NODE_ENV === "development" ? err.stack : null
-//     })
-// }
+  // ✅ Prisma Record Not Found
+  else if (
+    err instanceof Prisma.PrismaClientKnownRequestError &&
+    err.code === "P2025"
+  ) {
+    statusCode = 404;
+    message = "Record not found";
+  }
+
+  // ✅ Prisma Validation Error
+  else if (err instanceof Prisma.PrismaClientValidationError) {
+    statusCode = 400;
+    message = "Invalid data provided to Prisma";
+  }
+
+// ✅ Zod Validation Error
+else if (err instanceof ZodError) {
+  statusCode = 400;
+  message = "Validation failed";
+  errorSources = err.issues.map((issue) => ({
+    path: issue.path.join("."),  // array of keys => string
+    message: issue.message,
+  }));
+}
+
+  // ✅ Custom AppError
+  else if (err instanceof AppError) {
+    statusCode = err.statusCode;
+    message = err.message;
+  }
+
+  // ✅ Native JS Error
+  else if (err instanceof Error) {
+    statusCode = 500;
+    message = err.message;
+  }
+
+  // 🚀 Send Final Error Response
+  res.status(statusCode).json({
+    success: false,
+    message,
+    errorSources,
+    err: envVars.NODE_ENV === "development" ? err : null,
+    stack: envVars.NODE_ENV === "development" ? err.stack : null,
+  });
+};

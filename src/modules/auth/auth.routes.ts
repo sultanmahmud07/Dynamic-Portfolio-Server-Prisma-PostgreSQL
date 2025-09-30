@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post(
     "/login",
-    AuthController.loginWithEmailAndPassword
+    AuthController.login
 )
 router.post("/logout", AuthController.logout);
 
