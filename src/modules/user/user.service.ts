@@ -1,6 +1,6 @@
 import { prisma } from "../../config/db";
 import { Prisma, User } from "@prisma/client"
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import { envVars } from "../../config/env";
 
 const createUser = async ( payload: Prisma.UserCreateInput ): Promise<User> => {
@@ -11,7 +11,7 @@ const createUser = async ( payload: Prisma.UserCreateInput ): Promise<User> => {
     if (existingOwner) {
         throw new Error("User already exists!");
     }
-    const hashedPassword = await bcrypt.hash(
+    const hashedPassword = await bcryptjs.hash(
     payload.password,
     Number(envVars.BCRYPT_SALT_ROUND)
   );

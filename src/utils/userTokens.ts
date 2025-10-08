@@ -1,7 +1,5 @@
-// import httpStatus from "http-status-codes";
-// import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../config/env";
-import { generateToken, verifyToken } from "./jwt";
+import { generateToken } from "./jwt";
 import { Prisma } from "@prisma/client";
 
 export const createUserTokens = (user:  Prisma.UserCreateInput) => {
