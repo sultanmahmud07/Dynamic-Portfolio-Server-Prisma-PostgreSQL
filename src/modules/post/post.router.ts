@@ -4,14 +4,11 @@ import { PostController } from './post.controller';
 const router = express.Router();
 router.get("/stats", PostController.getBlogStat)
 
-router.post(
-    "/",
-    PostController.createPost
-)
-
 router.get("/", PostController.getAllPosts);
 router.get("/:id", PostController.getPostById);
-router.patch("/:id", PostController.updatePost);
-router.delete("/:id", PostController.deletePost);
+router.post("/create", PostController.createPost)
+router.patch("/update/:id", PostController.updatePost);
+router.delete("/delete/:id", PostController.deletePost);
+
 
 export const postRouter = router;

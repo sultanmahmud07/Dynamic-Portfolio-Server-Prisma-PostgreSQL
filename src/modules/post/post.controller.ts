@@ -1,55 +1,80 @@
 import { Request, Response } from "express";
 import { PostService } from "./post.service";
+import { sendResponse } from "../../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync";
+import httpStatus from "http-status-codes";
 
-const createPost = async (req: Request, res: Response) => {
-    try {
-        const result = await PostService.createPost(req.body)
-        res.status(201).json(result);
-    } catch (error) {
-        res.status(500).send(error)
-    }
-}
+const createPost = catchAsync(async (req: Request, res: Response) => {
+    const blog = await PostService.createPost(req.body)
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Blog create Successfully",
+        data: blog,
+    })
+})
 
-const getAllPosts = async (req: Request, res: Response) => {
-    try {
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
-        const search = (req.query.search as string) || "";
-        const isFeatured = req.query.isFeatured ? req.query.isFeatured === "true" : undefined
-        const tags = req.query.tags ? (req.query.tags as string).split(",") : []
+const getAllPosts = catchAsync(async (req: Request, res: Response) => {
 
-        const result = await PostService.getAllPosts({ page, limit, search, isFeatured, tags });
-        res.json(result);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch posts", details: err });
-    }
-};
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const search = (req.query.search as string) || "";
+    const isFeatured = req.query.isFeatured ? req.query.isFeatured === "true" : undefined
+    const tags = req.query.tags ? (req.query.tags as string).split(",") : []
 
-const getPostById = async (req: Request, res: Response) => {
+    const result = await PostService.getAllPosts({ page, limit, search, isFeatured, tags });
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "All post get Successfully",
+        data: result,
+    })
+});
+
+const getPostById = catchAsync(async (req: Request, res: Response) => {
+
     const post = await PostService.getPostById(Number(req.params.id));
-    if (!post) return res.status(404).json({ error: "Post not found" });
-    res.json(post);
-};
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Retrieve specific post Successfully",
+        data: post,
+    })
+});
 
-const updatePost = async (req: Request, res: Response) => {
+const updatePost = catchAsync(async (req: Request, res: Response,) => {
     const post = await PostService.updatePost(Number(req.params.id), req.body);
-    res.json(post);
-};
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Post Update Successfully",
+        data: post,
+    })
+});
 
-const deletePost = async (req: Request, res: Response) => {
+const deletePost = catchAsync(async (req: Request, res: Response,) => {
     await PostService.deletePost(Number(req.params.id));
-    res.json({ message: "Post deleted" });
-};
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Post delete Successfully",
+        data: null,
+    })
+});
 
 
-const getBlogStat = async (req: Request, res: Response) => {
-    try {
-        const result = await PostService.getBlogStat();
-        res.json(result);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch stats", details: err });
-    }
-};
+const getBlogStat = catchAsync(async (req: Request, res: Response,) => {
+
+    const result = await PostService.getBlogStat();
+    res.json(result);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Get static data Successfully",
+        data: result,
+    })
+});
 
 export const PostController = {
     createPost,

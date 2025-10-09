@@ -2,21 +2,24 @@ import { Post, Prisma } from "@prisma/client";
 import { prisma } from "../../config/db";
 
 const createPost = async (payload: Prisma.PostCreateInput): Promise<Post> => {
-    const result = await prisma.post.create({
-        data: payload,
-        include: {
-            author: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true
-                }
-            }
-        }
-    })
+  const userExists = await prisma.user.findUnique({
+    where: { id:  (payload as any).authorId },
+  });
 
-    return result;
-}
+  if (!userExists) {
+    throw new Error("Author not found — please provide a valid user ID");
+  }
+
+  const result = await prisma.post.create({
+    data: payload,
+    include: {
+      author: { select: { id: true, name: true, email: true } },
+    },
+  });
+
+  return result;
+};
+
 
 const getAllPosts = async ({
     page = 1,
