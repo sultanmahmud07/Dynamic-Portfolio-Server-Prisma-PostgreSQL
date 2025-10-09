@@ -28,7 +28,7 @@ const storage = new CloudinaryStorage({
     // const folderName = req.body || "alive_gadget"; // fallback to "default"
     // console.log("Folder Name:", folderName)
     return {
-      folder: "alive_gadget", // ✅ Cloudinary folder
+      folder: "dynamic_portfolio_a7", // ✅ Cloudinary folder
       public_id: uniqueFileName,
       resource_type: "auto", // good for images, pdf, etc
     };

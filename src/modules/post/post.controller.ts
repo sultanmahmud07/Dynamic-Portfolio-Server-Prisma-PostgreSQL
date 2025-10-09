@@ -5,18 +5,23 @@ import { catchAsync } from "../../utils/catchAsync";
 import httpStatus from "http-status-codes";
 
 const createPost = catchAsync(async (req: Request, res: Response) => {
-       const payload = {
-        ...req.body,
-        thumbnail: req.file?.path
-    }
-    const blog = await PostService.createPost(payload)
+    const parsedData = req.body.data ? JSON.parse(req.body.data) : req.body;
+
+    const payload = {
+        ...parsedData,
+        thumbnail: req.file?.path,
+    };
+
+    const blog = await PostService.createPost(payload);
+
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "Blog create Successfully",
+        message: "Blog created successfully",
         data: blog,
-    })
-})
+    });
+});
+
 
 const getAllPosts = catchAsync(async (req: Request, res: Response) => {
 
@@ -48,7 +53,14 @@ const getPostById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updatePost = catchAsync(async (req: Request, res: Response,) => {
-    const post = await PostService.updatePost(Number(req.params.id), req.body);
+    const parsedData = req.body.data ? JSON.parse(req.body.data) : req.body;
+    const postId = req.params.id
+    const payload = {
+        ...parsedData,
+        thumbnail: req.file?.path,
+    };
+
+    const post = await PostService.updatePost(Number(postId), payload);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,

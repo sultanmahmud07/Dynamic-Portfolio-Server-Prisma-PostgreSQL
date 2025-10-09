@@ -1,23 +1,25 @@
 import { Post, Prisma } from "@prisma/client";
 import { prisma } from "../../config/db";
+import { deleteImageFromCLoudinary } from "../../config/cloudinary.config";
 
 const createPost = async (payload: Prisma.PostCreateInput): Promise<Post> => {
-  const userExists = await prisma.user.findUnique({
-    where: { id:  (payload as any).authorId },
-  });
 
-  if (!userExists) {
-    throw new Error("Author not found — please provide a valid user ID");
-  }
+    const userExists = await prisma.user.findUnique({
+        where: { id: (payload as any).authorId },
+    });
 
-  const result = await prisma.post.create({
-    data: payload,
-    include: {
-      author: { select: { id: true, name: true, email: true } },
-    },
-  });
+    if (!userExists) {
+        throw new Error("Author not found — please provide a valid user ID");
+    }
 
-  return result;
+    const result = await prisma.post.create({
+        data: payload,
+        include: {
+            author: { select: { id: true, name: true, email: true } },
+        },
+    });
+
+    return result;
 };
 
 
@@ -92,13 +94,44 @@ const getPostById = async (id: number) => {
         });
     })
 };
+const updatePost = async (id: number, payload: Partial<Post>) => {
+  // Check if post exists
+  const existingPost = await prisma.post.findUnique({ where: { id } });
+  if (!existingPost) {
+    throw new Error("Post not found.");
+  }
 
-const updatePost = async (id: number, data: Partial<any>) => {
-    return prisma.post.update({ where: { id }, data });
+  // Delete old thumbnail if a new one is provided
+  if (payload.thumbnail && existingPost.thumbnail) {
+    await deleteImageFromCLoudinary(existingPost.thumbnail);
+  }
+
+  // Update post
+  const updatedPost = await prisma.post.update({
+    where: { id },
+    data: payload,
+    include: {
+      author: { select: { id: true, name: true, email: true } },
+    },
+  });
+
+  return updatedPost;
 };
 
+
 const deletePost = async (id: number) => {
-    return prisma.post.delete({ where: { id } });
+    const existingPost = await prisma.post.findUnique({
+        where: { id },
+    });
+    if (!existingPost) {
+        throw new Error("Post not found.");
+    }
+    if (existingPost.thumbnail) {
+        await deleteImageFromCLoudinary(existingPost.thumbnail)
+    }
+    const deletedPost = await prisma.post.delete({ where: { id } });
+    return deletedPost;
+
 };
 
 

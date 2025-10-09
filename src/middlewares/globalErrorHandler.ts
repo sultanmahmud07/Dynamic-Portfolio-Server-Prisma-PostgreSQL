@@ -4,9 +4,10 @@ import AppError from "../errorHelpers/AppError";
 import { Prisma } from "@prisma/client";
 import { ZodError } from "zod";
 import { TErrorSources } from "../interfaces/error.types";
+import { deleteImageFromCLoudinary } from "../config/cloudinary.config";
 
 // 🎯 Global Error Handler
-export const globalErrorHandler = (
+export const globalErrorHandler = async (
   err: any,
   req: Request,
   res: Response,
@@ -15,6 +16,15 @@ export const globalErrorHandler = (
   if (envVars.NODE_ENV === "development") {
     console.error("🔥 Global Error Handler:", err);
   }
+    if (req.file) {
+        await deleteImageFromCLoudinary(req.file.path)
+    }
+
+    if (req.files && Array.isArray(req.files) && req.files.length) {
+        const imageUrls = (req.files as Express.Multer.File[]).map(file => file.path)
+
+        await Promise.all(imageUrls.map(url => deleteImageFromCLoudinary(url)))
+    }
 
   let errorSources: TErrorSources[] = [];
   let statusCode = 500;
