@@ -5,7 +5,11 @@ import { catchAsync } from "../../utils/catchAsync";
 import httpStatus from "http-status-codes";
 
 const createPost = catchAsync(async (req: Request, res: Response) => {
-    const blog = await PostService.createPost(req.body)
+       const payload = {
+        ...req.body,
+        thumbnail: req.file?.path
+    }
+    const blog = await PostService.createPost(payload)
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,

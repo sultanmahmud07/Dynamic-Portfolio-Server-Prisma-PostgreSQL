@@ -15,11 +15,31 @@ interface EnvConfig {
     BCRYPT_SALT_ROUND: string
     EXPRESS_SESSION_SECRET: string
     FRONTEND_URL: string
+    CLOUDINARY: {
+        CLOUDINARY_CLOUD_NAME: string;
+        CLOUDINARY_API_KEY: string;
+        CLOUDINARY_API_SECRET: string;
+    };
 
 }
 
 const loadEnvVariables = (): EnvConfig => {
-    const requiredEnvVariables: string[] = ["PORT", "DATABASE_URL", "NODE_ENV", "BCRYPT_SALT_ROUND", "JWT_ACCESS_EXPIRES", "JWT_ACCESS_SECRET", "SEED_EMAIL", "SEED_PASSWORD", "JWT_REFRESH_SECRET", "JWT_REFRESH_EXPIRES", "EXPRESS_SESSION_SECRET", "FRONTEND_URL"];
+    const requiredEnvVariables: string[] = ["PORT",
+        "DATABASE_URL",
+        "NODE_ENV",
+        "BCRYPT_SALT_ROUND",
+        "JWT_ACCESS_EXPIRES",
+        "JWT_ACCESS_SECRET",
+        "SEED_EMAIL",
+        "SEED_PASSWORD",
+        "JWT_REFRESH_SECRET",
+        "JWT_REFRESH_EXPIRES",
+        "EXPRESS_SESSION_SECRET",
+        "FRONTEND_URL",
+        "CLOUDINARY_CLOUD_NAME",
+        "CLOUDINARY_API_KEY",
+        "CLOUDINARY_API_SECRET",
+    ];
 
     requiredEnvVariables.forEach(key => {
         if (!process.env[key]) {
@@ -40,7 +60,12 @@ const loadEnvVariables = (): EnvConfig => {
         SEED_EMAIL: process.env.SEED_EMAIL as string,
         SEED_PASSWORD: process.env.SEED_PASSWORD as string,
         EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
-        FRONTEND_URL: process.env.FRONTEND_URL as string
+        FRONTEND_URL: process.env.FRONTEND_URL as string,
+        CLOUDINARY: {
+            CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+            CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+            CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+        },
 
     }
 }

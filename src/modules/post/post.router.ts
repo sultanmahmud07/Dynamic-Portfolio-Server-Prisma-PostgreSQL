@@ -1,8 +1,12 @@
 import express from 'express';
 import { PostController } from './post.controller';
+import { multerUpload } from '../../config/multer.config';
 
 const router = express.Router();
-router.get("/stats", PostController.getBlogStat)
+router.get("/stats",
+      multerUpload.single("file"),
+      PostController.getBlogStat
+)
 
 router.get("/", PostController.getAllPosts);
 router.get("/:id", PostController.getPostById);
