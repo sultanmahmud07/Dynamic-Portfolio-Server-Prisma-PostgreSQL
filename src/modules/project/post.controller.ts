@@ -53,10 +53,10 @@ const getProjectById = catchAsync(async (req: Request, res: Response) => {
 const updateProject = catchAsync(async (req: Request, res: Response,) => {
     const parsedData = req.body.data ? JSON.parse(req.body.data) : req.body;
     const projectId = req.params.id
-    const payload = {
+      const payload = {
         ...parsedData,
-        thumbnail: req.file?.path,
-    };
+        images: (req.files as Express.Multer.File[]).map(file => file.path)
+    }
 
     const project = await ProjectService.updateProject(Number(projectId), payload);
     sendResponse(res, {
