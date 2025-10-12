@@ -24,9 +24,6 @@ const storage = new CloudinaryStorage({
       Date.now() +
       "-" +
       safeName;
-   // ✅ get folder dynamically (example: from body or query)
-    // const folderName = req.body || "alive_gadget"; // fallback to "default"
-    // console.log("Folder Name:", folderName)
     return {
       folder: "dynamic_portfolio_a7", // ✅ Cloudinary folder
       public_id: uniqueFileName,

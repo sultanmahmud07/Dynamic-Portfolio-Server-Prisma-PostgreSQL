@@ -8,6 +8,7 @@ import { authRouter } from "./modules/auth/auth.routes";
 import notFound from "./middlewares/notFound";
 import { envVars } from "./config/env";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import { projectRouter } from "./modules/project/post.router";
 
 const app = express();
 
@@ -28,9 +29,10 @@ app.use(
   })
 );
 
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/post", postRouter);
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/project", projectRouter);
 
 
 app.get("/", (_req, res) => {
