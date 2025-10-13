@@ -11,7 +11,7 @@ router.get("/stats",
 )
 
 router.get("/", PostController.getAllPosts);
-router.get("/:id", PostController.getPostById);
+router.get("/:slug", PostController.getPostById);
 
 router.post("/create",
       checkAuth(...Object.values(Role)),

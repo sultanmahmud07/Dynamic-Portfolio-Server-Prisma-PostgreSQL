@@ -7,7 +7,7 @@ import { multerUpload } from '../../config/multer.config';
 const router = express.Router();
 router.get("/", ProjectController.getAllProjects);
 
-router.get("/:id", ProjectController.getProjectById);
+router.get("/:slug", ProjectController.getProjectById);
 
 router.post("/create",
       checkAuth(...Object.values(Role)),
