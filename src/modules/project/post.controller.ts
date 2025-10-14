@@ -8,7 +8,7 @@ const createProject = catchAsync(async (req: Request, res: Response) => {
     const parsedData = req.body.data ? JSON.parse(req.body.data) : req.body;
     const payload = {
         ...parsedData,
-        images: (req.files as Express.Multer.File[]).map(file => file.path)
+        images: (req.files as Express.Multer.File[])?.map(file => file.path)
     }
     const project = await ProjectService.createProject(payload);
 
@@ -55,7 +55,7 @@ const updateProject = catchAsync(async (req: Request, res: Response,) => {
     const projectId = req.params.id
       const payload = {
         ...parsedData,
-        images: (req.files as Express.Multer.File[]).map(file => file.path)
+        images: (req.files as Express.Multer.File[])?.map(file => file.path)
     }
 
     const project = await ProjectService.updateProject(Number(projectId), payload);

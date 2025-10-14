@@ -17,10 +17,18 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
         })
 });
 
-const logout = (req: Request, res: Response) => {
-    res.clearCookie("token");
-    res.json({ message: "Logged out" });
+export const logout = (req: Request, res: Response) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: isProduction,          // only true in production
+    sameSite: isProduction ? "none" : "lax",  // 'lax' for dev to avoid CORS issues
+  });
+
+  res.status(200).json({ message: "Logged out successfully" });
 };
+
 
 const changePassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 

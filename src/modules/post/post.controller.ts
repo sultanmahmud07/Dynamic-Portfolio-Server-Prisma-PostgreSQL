@@ -5,13 +5,13 @@ import { catchAsync } from "../../utils/catchAsync";
 import httpStatus from "http-status-codes";
 
 const createPost = catchAsync(async (req: Request, res: Response) => {
-    const parsedData = req.body.data ? JSON.parse(req.body.data) : req.body;
-
+    const {authorId, ...rest} = req.body.data ? JSON.parse(req.body.data) : req.body;
+const authorIdNum = Number(authorId);
     const payload = {
-        ...parsedData,
+        ...rest,
         thumbnail: req.file?.path,
+        authorId: authorIdNum
     };
-
     const blog = await PostService.createPost(payload);
 
     sendResponse(res, {

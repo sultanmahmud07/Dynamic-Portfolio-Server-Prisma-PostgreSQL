@@ -3,10 +3,32 @@ import { prisma } from "../../config/db";
 import { deleteImageFromCLoudinary } from "../../config/cloudinary.config";
 
 const createPost = async (payload: Prisma.PostCreateInput): Promise<Post> => {
+     // Convert stringified tags to array if necessary
+  if (typeof payload.tags === "string") {
+    try {
+      payload.tags = JSON.parse(payload.tags); // ["sfsd", "sdf"]
+    } catch (err) {
+      payload.tags = []; // fallback empty array if parsing fails
+    }
+  }
 
-    const userExists = await prisma.user.findUnique({
-        where: { id: (payload as any).authorId },
-    });
+  // ✅ Convert boolean and numeric strings
+  if (typeof payload.isFeatured === "string") {
+    payload.isFeatured = payload.isFeatured === "true";
+  }
+
+  if (typeof payload.published === "string") {
+    payload.published = payload.published === "true";
+  }
+
+  if (typeof payload.views === "string") {
+    payload.views = parseInt(payload.views, 10);
+  }
+
+  console.log("Hello:", payload);
+  const userExists = await prisma.user.findUnique({
+    where: { id: (payload as any).authorId },
+  });
 
     if (!userExists) {
         throw new Error("Author not found — please provide a valid user ID");
@@ -27,12 +49,14 @@ const getAllPosts = async ({
     page = 1,
     limit = 10,
     search,
+    sort = "desc", // default sort order
     isFeatured,
     tags
 }: {
     page?: number,
     limit?: number,
     search?: string,
+    sort?: string,
     isFeatured?: boolean,
     tags?: string[]
 }) => {
@@ -60,7 +84,7 @@ const getAllPosts = async ({
             author: true
         },
         orderBy: {
-            createdAt: "desc"
+            createdAt: sort === "asc" ? "asc" : "desc"
         }
     });
 
