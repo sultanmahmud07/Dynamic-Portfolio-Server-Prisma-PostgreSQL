@@ -25,7 +25,6 @@ const createPost = async (payload: Prisma.PostCreateInput): Promise<Post> => {
     payload.views = parseInt(payload.views, 10);
   }
 
-  console.log("Hello:", payload);
   const userExists = await prisma.user.findUnique({
     where: { id: (payload as any).authorId },
   });

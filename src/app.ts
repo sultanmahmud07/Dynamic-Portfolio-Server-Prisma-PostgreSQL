@@ -9,7 +9,7 @@ import { authRouter } from "./modules/auth/auth.routes";
 import notFound from "./middlewares/notFound";
 import { envVars } from "./config/env";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
-import { projectRouter } from "./modules/project/post.router";
+import { projectRouter } from "./modules/project/project.router";
 
 const app = express();
 

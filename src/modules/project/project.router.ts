@@ -1,7 +1,7 @@
 import express from 'express';
 import { checkAuth } from '../../middlewares/checkAuth';
 import { Role } from '@prisma/client';
-import { ProjectController } from './post.controller';
+import { ProjectController } from './project.controller';
 import { multerUpload } from '../../config/multer.config';
 
 const router = express.Router();

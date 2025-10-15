@@ -2,12 +2,14 @@ import { Request, Response } from "express";
 import { sendResponse } from "../../utils/sendResponse";
 import { catchAsync } from "../../utils/catchAsync";
 import httpStatus from "http-status-codes";
-import { ProjectService } from "./post.service";
+import { ProjectService } from "./project.service";
 
 const createProject = catchAsync(async (req: Request, res: Response) => {
-    const parsedData = req.body.data ? JSON.parse(req.body.data) : req.body;
+       const {authorId, ...rest} = req.body.data ? JSON.parse(req.body.data) : req.body;
+const authorIdNum = Number(authorId);
     const payload = {
-        ...parsedData,
+        ...rest,
+        authorId: authorIdNum,
         images: (req.files as Express.Multer.File[])?.map(file => file.path)
     }
     const project = await ProjectService.createProject(payload);
