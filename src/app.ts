@@ -10,6 +10,7 @@ import notFound from "./middlewares/notFound";
 import { envVars } from "./config/env";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import { projectRouter } from "./modules/project/project.router";
+import { ContactRoutes } from "./modules/contact/contact.route";
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/post", postRouter);
 app.use("/api/v1/project", projectRouter);
+app.use("/api/v1/contact", ContactRoutes);
 
 app.get("/", (_req, res) => {
   res.send("Portfolio API is running");
