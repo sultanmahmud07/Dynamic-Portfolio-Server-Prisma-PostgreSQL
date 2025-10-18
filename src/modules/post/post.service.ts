@@ -118,18 +118,45 @@ const getPostById = async (slug: string) => {
     })
 };
 const updatePost = async (id: number, payload: Partial<Post>) => {
-  // Check if post exists
   const existingPost = await prisma.post.findUnique({ where: { id } });
   if (!existingPost) {
     throw new Error("Post not found.");
   }
+  if (typeof payload.tags === "string") {
+    try {
+      payload.tags = JSON.parse(payload.tags);
+    } catch (err) {
+      payload.tags = [];
+    }
+  }
 
-  // Delete old thumbnail if a new one is provided
+  if (typeof payload.isFeatured === "string") {
+    payload.isFeatured = payload.isFeatured === "true";
+  }
+
+  if (typeof payload.published === "string") {
+    payload.published = payload.published === "true";
+  }
+
+  if (typeof payload.views === "string") {
+    payload.views = parseInt(payload.views, 10);
+  }
+
+  if ((payload as any).authorId) {
+    const userExists = await prisma.user.findUnique({
+      where: { id: (payload as any).authorId },
+    });
+    if (!userExists) {
+      throw new Error("Author not found — please provide a valid user ID");
+    }
+  }
+
+  // ✅ Delete old thumbnail from Cloudinary if new one is provided
   if (payload.thumbnail && existingPost.thumbnail) {
     await deleteImageFromCLoudinary(existingPost.thumbnail);
   }
 
-  // Update post
+  // ✅ Update post in DB
   const updatedPost = await prisma.post.update({
     where: { id },
     data: payload,
@@ -140,6 +167,7 @@ const updatePost = async (id: number, payload: Partial<Post>) => {
 
   return updatedPost;
 };
+
 
 
 const deletePost = async (id: number) => {

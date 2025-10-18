@@ -117,55 +117,99 @@ const getProjectById = async (slug: string) => {
     })
 };
 
-export const updateProject = async (id: number, payload: Partial<Project> & { deleteImages?: string[] }) => {
-    // 1️⃣ Check if the project exists
-    const existingProject = await prisma.project.findUnique({
-        where: { id },
+export const updateProject = async (
+  id: number,
+  payload: Partial<Project> & { deleteImages?: string[] }
+) => {
+  // 1️⃣ Validate if project exists
+  const existingProject = await prisma.project.findUnique({
+    where: { id },
+  });
+
+  if (!existingProject) {
+    throw new Error("Project not found.");
+  }
+
+  // 2️⃣ Handle and normalize stringified data
+  if (typeof payload.features === "string") {
+    try {
+      payload.features = JSON.parse(payload.features);
+    } catch (err) {
+      payload.features = [];
+    }
+  }
+  // 2️⃣ Handle and normalize stringified data
+  if (payload.deleteImages && typeof payload.deleteImages === "string") {
+    try {
+      payload.deleteImages = JSON.parse(payload.deleteImages);
+    } catch (err) {
+      payload.deleteImages = [];
+    }
+  }
+
+  if (typeof payload.technologies === "string") {
+    try {
+      payload.technologies = JSON.parse(payload.technologies);
+    } catch (err) {
+      payload.technologies = [];
+    }
+  }
+
+  if (typeof payload.isFeatured === "string") {
+    payload.isFeatured = payload.isFeatured === "true";
+  }
+
+  if (typeof payload.views === "string") {
+    payload.views = Number(payload.views);
+  }
+
+  // 3️⃣ If authorId provided, validate user existence
+  if ((payload as any).authorId) {
+    const userExists = await prisma.user.findUnique({
+      where: { id: (payload as any).authorId },
     });
-
-    if (!existingProject) {
-        throw new Error("Project not found.");
+    if (!userExists) {
+      throw new Error("Author not found — please provide a valid user ID");
     }
+  }
 
-    let updatedImages: string[] = existingProject.images || [];
+  // 4️⃣ Merge existing images and handle deletions
+  let updatedImages: string[] = existingProject.images || [];
 
-    // 2️⃣ Handle new images (append to existing)
-    if (payload.images && payload.images.length > 0) {
-        updatedImages = [...updatedImages, ...payload.images];
-    }
+  if (payload.images && payload.images.length > 0) {
+    updatedImages = [...updatedImages, ...payload.images];
+  }
 
-    // 3️⃣ Handle image deletions
-    if (payload.deleteImages && payload.deleteImages.length > 0) {
-        // Filter out deleted images
-        updatedImages = updatedImages.filter(
-            (imageUrl) => !payload.deleteImages?.includes(imageUrl)
-        );
+  if (payload.deleteImages && payload.deleteImages.length > 0) {
+    updatedImages = updatedImages.filter(
+      (imageUrl) => !payload.deleteImages?.includes(imageUrl)
+    );
 
-        // Delete removed images from Cloudinary
-        await Promise.all(
-            payload.deleteImages.map((url) => deleteImageFromCLoudinary(url))
-        );
-    }
+    await Promise.all(
+      payload.deleteImages.map((url) => deleteImageFromCLoudinary(url))
+    );
+  }
 
-    // 4️⃣ If thumbnail is replaced, delete the old one
-    if (payload.thumbnail && existingProject.thumbnail) {
-        await deleteImageFromCLoudinary(existingProject.thumbnail);
-    }
+  // 5️⃣ Handle thumbnail replacement
+  if (payload.thumbnail && existingProject.thumbnail) {
+    await deleteImageFromCLoudinary(existingProject.thumbnail);
+  }
 
-    // 5️⃣ Update the project
-    const updatedProject = await prisma.project.update({
-        where: { id },
-        data: {
-            ...payload,
-            images: updatedImages,
-        },
-        include: {
-            author: { select: { id: true, name: true, email: true } },
-        },
-    });
+  // 6️⃣ Update project in database
+  const updatedProject = await prisma.project.update({
+    where: { id },
+    data: {
+      ...payload,
+      images: updatedImages,
+    },
+    include: {
+      author: { select: { id: true, name: true, email: true } },
+    },
+  });
 
-    return updatedProject;
+  return updatedProject;
 };
+
 
 
 
