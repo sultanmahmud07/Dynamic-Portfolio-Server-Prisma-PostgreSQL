@@ -29,6 +29,7 @@ app.use(
   })
 );
 
+app.options("*", cors()); 
 
 app.use(compression());
 app.use(cookieParser());
