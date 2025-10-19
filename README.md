@@ -164,12 +164,10 @@ npm run dev
 
 ---
 
-## 🧩 Dashboard Features
+## 🌍 Live Links
 
-- Overview of total projects, skills, experiences, and blogs  
-- Recently added items tracking  
-- Admin-only protected access  
-- Statistics visualization (Frontend integration ready)
+- **Frontend (Live Demo):** [https://sultan-mahmud-portfolio.vercel.app](https://sultan-mahmud-portfolio.vercel.app)  
+- **Backend (API):** [https://assignment-7-postgre-sql-and-prisma.vercel.app/api/v1](https://assignment-7-postgre-sql-and-prisma.vercel.app/api/v1)  
 
 ---
 
@@ -181,3 +179,12 @@ For accessing the **Admin Dashboard**:
 Email: owner@gmail.com
 Password: W@123456
 ```
+
+---
+
+## 🧩 Dashboard Features
+
+- Overview of total projects, skills, experiences, and blogs  
+- Recently added items tracking  
+- Admin-only protected access  
+- Statistics visualization (Frontend integration ready)
