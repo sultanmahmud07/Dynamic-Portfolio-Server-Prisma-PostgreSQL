@@ -15,13 +15,20 @@ import { statsRouter } from "./modules/stats/stats.router";
 
 const app = express();
 
-// ✅ Correct CORS middleware (only once)
+
+// ✅ CORS FIXED
 app.use(
   cors({
-    origin: "https://sultan-mahmud-portfolio.vercel.app",
+    origin: [
+      "https://sultan-mahmud-portfolio.vercel.app",
+      "http://localhost:3000",
+    ],
     credentials: true,
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 app.use(compression());
 app.use(cookieParser());
