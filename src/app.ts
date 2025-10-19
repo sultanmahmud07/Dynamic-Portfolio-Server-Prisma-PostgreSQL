@@ -24,12 +24,10 @@ app.use(
       "http://localhost:3000",
     ],
     credentials: true,
-    methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"]
   })
 );
 
-app.options("*", cors()); 
 
 app.use(compression());
 app.use(cookieParser());
