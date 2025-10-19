@@ -11,6 +11,7 @@ import { envVars } from "./config/env";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import { projectRouter } from "./modules/project/project.router";
 import { ContactRoutes } from "./modules/contact/contact.route";
+import { statsRouter } from "./modules/stats/stats.router";
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/post", postRouter);
 app.use("/api/v1/project", projectRouter);
 app.use("/api/v1/contact", ContactRoutes);
+app.use("/api/v1/stats", statsRouter);
 
 app.get("/", (_req, res) => {
   res.send("Portfolio API is running");
