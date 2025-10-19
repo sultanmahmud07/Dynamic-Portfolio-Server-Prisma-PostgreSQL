@@ -18,12 +18,7 @@ const app = express();
 // ✅ Correct CORS middleware (only once)
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      "https://sultan-mahmud.vercel.app",
-      "https://sultan-mahmud-portfolio.vercel.app",
-    ],
+    origin: "https://sultan-mahmud-portfolio.vercel.app",
     credentials: true,
   })
 );
